@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en" data-page-node-id="sRU0dtBbeXTsZQDw2w1U01">
+<head data-page-node-id="h0NQ7E0PDCOPsEc0NXETgs">
+<meta charset="UTF-8" data-page-node-id="zXOFArmc8BpObBu9YyDEmj">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="vQy4TlGiwkSOLBbZXyimWH">
+<title>SPACE KNOWLEDGE QUIZ</title>
+<style>
+  /* ===================== BASE / RESET ===================== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100vw; height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    background: #061A2F;
+    font-family: "Segoe UI", "Trebuchet MS", "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===================== FULL-SCREEN STAGE ===================== */
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    background: radial-gradient(ellipse at 50% 35%, #0B2742 0%, #071D34 55%, #061A2F 100%);
+    overflow: hidden;
+    container-type: size;
+  }
+
+  /* ===================== BACKGROUND FX ===================== */
+  .nebula {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.45;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .neb-1 { width: 46vw; height: 46vw; left: -10vw; top: -8vh;
+    background: radial-gradient(circle, rgba(63,150,255,.55), transparent 70%);
+    animation: drift1 26s ease-in-out infinite; }
+  .neb-2 { width: 40vw; height: 40vw; right: -8vw; bottom: -10vh;
+    background: radial-gradient(circle, rgba(150,80,255,.5), transparent 70%);
+    animation: drift2 30s ease-in-out infinite; }
+  .neb-3 { width: 30vw; height: 30vw; right: 20vw; top: 5vh;
+    background: radial-gradient(circle, rgba(46,230,166,.35), transparent 70%);
+    animation: drift1 22s ease-in-out infinite reverse; }
+  @keyframes drift1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(4vw,3vh)} }
+  @keyframes drift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-3vw,-4vh)} }
+
+  #starfield { position: absolute; inset: 0; pointer-events: none; }
+  .star {
+    position: absolute;
+    background: #FFFFFF;
+    border-radius: 50%;
+    opacity: .7;
+    animation: twinkle linear infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: .15; transform: scale(.7); }
+    50%     { opacity: 1;   transform: scale(1.1); }
+  }
+  .shooting {
+    position: absolute;
+    width: 14vw; height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0), #fff);
+    opacity: 0;
+    transform: rotate(-25deg);
+    animation: shoot 9s ease-in infinite;
+  }
+  @keyframes shoot {
+    0% { opacity: 0; left: -20vw; top: 10vh; }
+    12% { opacity: .9; }
+    22% { opacity: 0; left: 60vw; top: 38vh; }
+    100% { opacity: 0; left: 60vw; top: 38vh; }
+  }
+
+  /* ===================== SCREEN (three-segment) ===================== */
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden;
+    transition: opacity .55s ease, visibility .55s ease;
+    z-index: 2;
+  }
+  .screen.active { opacity: 1; visibility: visible; z-index: 3; }
+
+  .screen-top {
+    flex: 0 0 auto;
+    padding: 2.4vh 4vw 0;
+  }
+  .screen-mid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 1.5vh 4vw;
+    overflow: hidden;
+  }
+  .screen-footer, .footer-controls {
+    flex: 0 0 auto;
+    flex-shrink: 0;
+    min-height: 10vh;
+    display: flex; align-items: center; justify-content: center;
+    gap: 2vw;
+    padding: 1.5vh 4vw 2.6vh;
+  }
+
+  /* ===================== BUTTONS ===================== */
+  .btn {
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    font-weight: 800;
+    color: #061A2F;
+    border-radius: 1.4vw;
+    transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+    letter-spacing: .08vw;
+    user-select: none;
+  }
+  .btn:hover { transform: translateY(-3px) scale(1.04); filter: brightness(1.08); }
+  .btn:active { transform: translateY(1px) scale(.97); }
+  .btn:disabled { cursor: not-allowed; opacity: .35; transform: none; filter: grayscale(.5); box-shadow: none; }
+
+  .btn-start {
+    font-size: clamp(22px, 3vw, 40px);
+    padding: 2.2vh 5vw;
+    background: linear-gradient(135deg, #5BC8FF, #38E0FF);
+    color: #04121F;
+    box-shadow: 0 0 30px rgba(91,200,255,.6), 0 8px 24px rgba(0,0,0,.4);
+  }
+  .btn-start:hover { box-shadow: 0 0 50px rgba(91,200,255,.9), 0 8px 30px rgba(0,0,0,.5); }
+
+  .btn-true {
+    background: linear-gradient(135deg, #1FB6B6, #2EE6A6);
+    color: #04231E;
+    box-shadow: 0 0 22px rgba(46,230,166,.5), 0 6px 18px rgba(0,0,0,.35);
+  }
+  .btn-true:hover { box-shadow: 0 0 40px rgba(46,230,166,.85), 0 6px 22px rgba(0,0,0,.45); }
+  .btn-false {
+    background: linear-gradient(135deg, #FF7A45, #FF4D6D);
+    color: #2A0A10;
+    box-shadow: 0 0 22px rgba(255,77,109,.5), 0 6px 18px rgba(0,0,0,.35);
+  }
+  .btn-false:hover { box-shadow: 0 0 40px rgba(255,77,109,.85), 0 6px 22px rgba(0,0,0,.45); }
+
+  .btn-next {
+    font-size: clamp(20px, 2.6vw, 36px);
+    padding: 1.8vh 4.5vw;
+    background: linear-gradient(135deg, #FFD23F, #FFB547);
+    color: #2A1B00;
+    box-shadow: 0 0 28px rgba(255,210,63,.6), 0 6px 20px rgba(0,0,0,.4);
+  }
+  .btn-ghost {
+    font-size: clamp(18px, 2.2vw, 30px);
+    padding: 1.6vh 3.5vw;
+    background: rgba(255,255,255,.08);
+    color: #EAF4FF;
+    border: 2px solid rgba(255,255,255,.35);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.18); box-shadow: 0 0 22px rgba(91,200,255,.4); }
+
+  /* ===================== START SCREEN ===================== */
+  .title-main {
+    font-size: clamp(34px, 5.5vw, 76px);
+    font-weight: 800;
+    letter-spacing: .3vw;
+    color: #5BC8FF;
+    text-shadow: 0 0 18px rgba(91,200,255,.7), 0 0 50px rgba(91,200,255,.35);
+    text-align: center;
+    line-height: 1.1;
+  }
+  .vs-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4vw; margin: 3vh 0 1.5vh;
+  }
+  .team-badge { font-size: clamp(26px, 4vw, 56px); font-weight: 800; letter-spacing: .15vw; }
+  .team-badge.a { color: #38E0FF; text-shadow: 0 0 16px rgba(56,224,255,.6); }
+  .team-badge.b { color: #FF9F43; text-shadow: 0 0 16px rgba(255,159,67,.6); }
+  .vs-word {
+    font-size: clamp(22px, 3vw, 44px); font-weight: 800; color: #FFD23F;
+    text-shadow: 0 0 14px rgba(255,210,63,.6);
+  }
+  .sub-info {
+    font-size: clamp(16px, 2vw, 28px); color: #CFE8FF; letter-spacing: .12vw; margin-bottom: 3vh;
+    text-align: center;
+  }
+  .deco-row { font-size: clamp(28px, 4.5vw, 60px); margin-bottom: 2vh; letter-spacing: 1.2vw;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,.25)); text-align: center; }
+
+  /* ===================== QUIZ SCREEN ===================== */
+  .quiz-top { display: flex; align-items: center; width: 100%; }
+  .quiz-top .q-counter {
+    flex: 1 1 0; text-align: left;
+    font-size: clamp(16px, 1.9vw, 26px); font-weight: 700; color: #FFD23F;
+    letter-spacing: .1vw; text-shadow: 0 0 12px rgba(255,210,63,.4);
+  }
+  .quiz-top .quiz-title {
+    flex: 0 0 auto; text-align: center;
+    font-size: clamp(18px, 2.3vw, 32px); font-weight: 800; color: #5BC8FF;
+    text-shadow: 0 0 16px rgba(91,200,255,.6); letter-spacing: .18vw;
+  }
+  .quiz-top .top-spacer { flex: 1 1 0; }
+
+  .quiz-mid { flex-direction: row; align-items: center; justify-content: center; gap: 2vw; }
+
+  .team-side {
+    width: 22vw; padding: 2.6vh 1.4vw;
+    display: flex; flex-direction: column; align-items: center; gap: 1.8vh;
+    border-radius: 1.6vw; border: 3px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.04);
+    transition: box-shadow .35s ease, border-color .35s ease, transform .35s ease, opacity .35s ease;
+  }
+  .team-side.left  { border-color: rgba(56,224,255,.4);  box-shadow: 0 0 22px rgba(56,224,255,.25); }
+  .team-side.right { border-color: rgba(255,159,67,.4); box-shadow: 0 0 22px rgba(255,159,67,.25); }
+  .team-side.locked.left  { box-shadow: 0 0 40px rgba(56,224,255,.7); border-color: #38E0FF; transform: scale(1.03); }
+  .team-side.locked.right { box-shadow: 0 0 40px rgba(255,159,67,.7); border-color: #FF9F43; transform: scale(1.03); }
+  .team-side.out { opacity: .45; filter: grayscale(.3); }
+  .team-side .p-name { font-size: clamp(20px, 2.4vw, 34px); font-weight: 800; letter-spacing: .1vw; }
+  .team-side.left  .p-name { color: #38E0FF; }
+  .team-side.right .p-name { color: #FF9F43; }
+  .team-side .p-score {
+    font-size: clamp(40px, 6vw, 84px); font-weight: 900; color: #FFD23F;
+    text-shadow: 0 0 16px rgba(255,210,63,.5); line-height: 1.05;
+    transition: transform .3s ease;
+  }
+  .team-side .p-score.pop { transform: scale(1.35); }
+  .team-buttons { display: flex; flex-direction: column; gap: 1.4vh; width: 100%; }
+  .team-buttons .btn { width: 100%; font-size: clamp(20px, 2.6vw, 34px); padding: 1.6vh 0; border-radius: 1.4vw; }
+  .team-feedback {
+    min-height: 4.5vh; font-size: clamp(16px, 2vw, 26px); font-weight: 900; text-align: center; line-height: 1.2;
+  }
+  .team-feedback.correct { color: #2EE6A6; text-shadow: 0 0 14px rgba(46,230,166,.6); }
+  .team-feedback.wrong   { color: #FF5A5A; text-shadow: 0 0 14px rgba(255,90,90,.6); }
+
+  .quiz-center {
+    display: flex; flex-direction: column; align-items: center;
+    width: 44vw; text-align: center; gap: 2.4vh;
+  }
+  .question-img { display: flex; justify-content: center; }
+  .question-img svg { width: clamp(80px, 11vw, 150px); height: clamp(80px, 11vw, 150px);
+    filter: drop-shadow(0 0 10px rgba(91,200,255,.4)); }
+  .question-text {
+    font-size: clamp(30px, 3.4vw, 46px); font-weight: 600; line-height: 1.35; color: #FFFFFF;
+    padding: 0 1vw;
+  }
+
+  .hidden { display: none !important; }
+
+  /* ===================== RESULT SCREEN ===================== */
+  .result-title {
+    font-size: clamp(30px, 4.5vw, 64px); font-weight: 900; color: #5BC8FF;
+    text-shadow: 0 0 20px rgba(91,200,255,.7); letter-spacing: .2vw; margin-bottom: 1vh;
+  }
+  .result-scores { display: flex; gap: 5vw; align-items: center; margin: 2vh 0; }
+  .rs-block { text-align: center; }
+  .rs-block .rs-name { font-size: clamp(20px, 2.4vw, 34px); font-weight: 800; }
+  .rs-block .rs-num { font-size: clamp(46px, 7vw, 90px); font-weight: 900; color: #FFD23F; text-shadow: 0 0 16px rgba(255,210,63,.5); }
+  .rs-block.left  .rs-name { color: #38E0FF; }
+  .rs-block.right .rs-name { color: #FF9F43; }
+  .winner-banner {
+    font-size: clamp(28px, 4vw, 58px); font-weight: 900; letter-spacing: .22vw;
+    margin: 1.5vh 0 2vh; animation: popBanner .6s ease;
+  }
+  .winner-banner.a { color: #38E0FF; text-shadow: 0 0 26px rgba(56,224,255,.8); }
+  .winner-banner.b { color: #FF9F43; text-shadow: 0 0 26px rgba(255,159,67,.8); }
+  .winner-banner.tie { color: #FFD23F; text-shadow: 0 0 26px rgba(255,210,63,.8); }
+  @keyframes popBanner { 0%{transform:scale(.5);opacity:0} 60%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
+
+  #confetti { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+  .conf { position: absolute; top: -6vh; border-radius: 50%; animation: fall linear forwards; }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0); opacity: 1; }
+    100% { transform: translateY(115vh) rotate(540deg); opacity: .2; }
+  }
+
+  /* ===================== ANSWERS SCREEN ===================== */
+  .ans-top { display: flex; flex-direction: column; align-items: center; gap: .4vh; padding-top: 2.2vh; }
+  .ans-title {
+    font-size: clamp(22px, 2.8vw, 34px); font-weight: 900; color: #5BC8FF;
+    text-shadow: 0 0 18px rgba(91,200,255,.6); letter-spacing: .12vw; text-align: center;
+  }
+  .ans-counter {
+    font-size: clamp(16px, 1.8vw, 24px); font-weight: 800; color: #FFD23F; letter-spacing: .12vw;
+  }
+  .card {
+    width: min(90vw, 880px);
+    max-height: 56vh;
+    overflow-y: auto;
+    background: rgba(255,255,255,.06);
+    border: 2px solid rgba(91,200,255,.35);
+    border-radius: 1.4vw;
+    padding: clamp(14px, 2.4vh, 30px) clamp(18px, 3vw, 42px);
+    box-shadow: 0 0 40px rgba(0,0,0,.4);
+    display: flex; flex-direction: column; gap: 1.8vh;
+    animation: cardIn .5s ease;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(3vh) scale(.97)} to{opacity:1;transform:none} }
+  .card-qnum { font-size: clamp(15px, 1.5vw, 20px); font-weight: 800; color: #FFD23F; letter-spacing: .12vw; }
+  .card-img { display: flex; justify-content: center; }
+  .card-img svg { width: clamp(50px, 5.5vw, 84px); height: clamp(50px, 5.5vw, 84px); filter: drop-shadow(0 0 8px rgba(91,200,255,.35)); }
+  .card-question { font-size: clamp(20px, 2.4vw, 30px); font-weight: 600; line-height: 1.4; color: #FFFFFF; }
+  .card-options { display: flex; gap: 1.4vw; }
+  .opt {
+    font-size: clamp(16px, 1.9vw, 26px); font-weight: 800; padding: .9vh 2.2vw;
+    border-radius: .9vw; border: 2px solid rgba(255,255,255,.25); color: #CFE8FF;
+  }
+  .opt.correct { border-color: #2EE6A6; color: #2EE6A6; background: rgba(46,230,166,.12); box-shadow: 0 0 18px rgba(46,230,166,.4); }
+  .card-answer { font-size: clamp(17px, 1.9vw, 28px); font-weight: 700; line-height: 1.4; }
+  .card-answer .lbl { color: #9FC4E8; }
+  .card-answer .val { color: #2EE6A6; font-weight: 900; }
+  .card-exp { font-size: clamp(15px, 1.7vw, 24px); line-height: 1.45; color: #EAF4FF; }
+  .card-exp .lbl { color: #9FC4E8; font-weight: 700; }
+  .finale { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.6vh; }
+  .finale-big { font-size: clamp(26px, 4vw, 56px); font-weight: 900; color: #5BC8FF; text-shadow: 0 0 18px rgba(91,200,255,.7); }
+  .finale-sub { font-size: clamp(18px, 2.4vw, 32px); color: #FFD23F; font-weight: 700; }
+
+  /* scrollbar styling for the card (internal only) */
+  .card::-webkit-scrollbar { width: 8px; }
+  .card::-webkit-scrollbar-thumb { background: rgba(91,200,255,.4); border-radius: 4px; }
+  .card::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body data-page-node-id="sGbjHmDWsFEwH4qs7ag0oC">
+<div class="stage" id="stage" data-page-node-id="jeoE3p2r0TCrmsB9DQOkb4">
+  <div class="nebula neb-1" data-page-node-id="ODVDhRBXV4m69nREukyLV4"></div>
+  <div class="nebula neb-2" data-page-node-id="Ib1pBXTcVMamo5lTXef3M1"></div>
+  <div class="nebula neb-3" data-page-node-id="mlGngUmYhG99UbsocE2Y3R"></div>
+  <div id="starfield" data-page-node-id="kPzaQlhlOtRDW0l2esY0o5"></div>
+  <div class="shooting" data-page-node-id="ZFq52nsf6um29iTk7z1Mjj"></div>
+  <div id="confetti" data-page-node-id="GGJSrARnPTYDDrd9Z5SObC"></div>
+
+  <!-- ============ START SCREEN ============ -->
+  <section class="screen active" id="screen-start" data-page-node-id="PJGpjnZkv0u0ObgpgBovmg">
+    <div class="screen-mid" data-page-node-id="oKi4LhnSciWQ7ZF27FDJTG">
+      <div class="deco-row" data-page-node-id="2uKEyiXBPsoiu2FhEmd6WK">🚀 🌍 🌕 ⭐ 👨‍🚀</div>
+      <h1 class="title-main" data-page-node-id="AGMnfDXPUpcqw8BGmK9Mp5">SPACE KNOWLEDGE<br data-page-node-id="2Ty1yEkJjDSC7hY4ULs7zJ">QUIZ</h1>
+      <div class="vs-row" data-page-node-id="GO4NujqHZewX6pvkpD58sT">
+        <span class="team-badge a" data-page-node-id="cOCXcG5aYuja9n2CCWBMYB">Team A</span>
+        <span class="vs-word" data-page-node-id="rv2CHc4BCbdawyP3Hdp7t2">VS</span>
+        <span class="team-badge b" data-page-node-id="VuqIWGvmIGBHT742LNR872">Team B</span>
+      </div>
+      <div class="sub-info" data-page-node-id="cu8fiZfYH81bdkm2BMuRv5">5 Questions &nbsp;·&nbsp; True or False?</div>
+    </div>
+    <div class="screen-footer footer-controls" data-page-node-id="HipfBlxvPtVk6ad4yvSaAF">
+      <button class="btn btn-start" id="btn-start" data-page-node-id="mqA63J2fVB6H3KWqv1ZAlQ">START MISSION</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ SCREEN ============ -->
+  <section class="screen" id="screen-quiz" data-page-node-id="z8eOd7wfsA36ZTaRefqAjv">
+    <div class="screen-top" data-page-node-id="HqQv66LZwbzGk4342KzIxD">
+      <div class="quiz-top" data-page-node-id="6LtLpfrmBkHxJcOAOJVSeD">
+        <div class="q-counter" id="q-counter" data-page-node-id="T5CnebStmGoOlLOpSYGHg9">Question 1 / 5</div>
+        <div class="quiz-title" data-page-node-id="rZB1lRBSAk1xoosNqyVgaG">SPACE KNOWLEDGE QUIZ</div>
+        <div class="top-spacer" data-page-node-id="ZUjKCqRAdqXcz52qR7An9O"></div>
+      </div>
+    </div>
+
+    <div class="screen-mid quiz-mid" data-page-node-id="iclD9LkiI5eDCqm8NEtnOJ">
+      <!-- LEFT: Team A -->
+      <div class="team-side left" id="side-a" data-page-node-id="vwtSVi9udR2R0wZ1Nsp9fi">
+        <div class="p-name" data-page-node-id="ctCRHAbYMsASD4lcog1YtC">TEAM A</div>
+        <div class="p-score" id="score-a" data-page-node-id="5jD4WsaGtNqi4KmDOB7SDq">0</div>
+        <div class="team-buttons" data-team="a" data-page-node-id="vZNXBGfXGJrwGNQzESOs3P">
+          <button class="btn btn-true"  data-team="a" data-val="true" data-page-node-id="p3kTQApCgCN72BAtVjr2sX">TRUE</button>
+          <button class="btn btn-false" data-team="a" data-val="false" data-page-node-id="5cAPxcbn8AuJCOmHZAs78m">FALSE</button>
+        </div>
+        <div class="team-feedback" id="fb-a" data-page-node-id="ApFwLZ1biIcM2N18mu9QTr"></div>
+      </div>
+
+      <!-- CENTER: Question -->
+      <div class="quiz-center" data-page-node-id="cZ71FezAPHb0JvCRmaFAyp">
+        <div class="question-img" id="question-img" data-page-node-id="bPvEpPwkfF8eCfyiDlLSy1"></div>
+        <div class="question-text" id="question-text" data-page-node-id="3BgLBX5iBdew2lpnU9hQsg">Question</div>
+      </div>
+
+      <!-- RIGHT: Team B -->
+      <div class="team-side right" id="side-b" data-page-node-id="ahGln3owhaczlsPyDQDAFY">
+        <div class="p-name" data-page-node-id="AJawt5n0TGlaKU7Eh4MRwg">TEAM B</div>
+        <div class="p-score" id="score-b" data-page-node-id="9gPWqnlRRdiiIvRpEXpGzA">0</div>
+        <div class="team-buttons" data-team="b" data-page-node-id="lG27EiPmW8zZl2BKmimO6U">
+          <button class="btn btn-true"  data-team="b" data-val="true" data-page-node-id="0nhlRuYZg8qSthQgQYffIE">TRUE</button>
+          <button class="btn btn-false" data-team="b" data-val="false" data-page-node-id="7j0MwAPHBT4pu9rP332GrM">FALSE</button>
+        </div>
+        <div class="team-feedback" id="fb-b" data-page-node-id="DndgzPOCU5pXwc6UROOLJS"></div>
+      </div>
+    </div>
+
+    <div class="screen-footer footer-controls" data-page-node-id="0Zz2dHNG1uDmHupB9UqNm2">
+      <button class="btn btn-next hidden" id="btn-next" data-page-node-id="boRoEja4EHq1EEuTbYfHz7">NEXT QUESTION</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <section class="screen" id="screen-result" data-page-node-id="x4okLSI6cBlZvvPl7UXtEc">
+    <div class="screen-mid" data-page-node-id="SZm41OYJsF1n6GlLGWwhl9">
+      <div class="result-title" data-page-node-id="fotwSXuQX1U2zJOzOIDFZE">MISSION COMPLETE</div>
+      <div class="result-scores" data-page-node-id="tCGhipGkMPBR272t4HG7vA">
+        <div class="rs-block left" data-page-node-id="kUeGIcCvY822N9BY11ANF3">
+          <div class="rs-name" data-page-node-id="x33TUJg5BCGt9m2u2vYCQe">TEAM A</div>
+          <div class="rs-num" id="result-a" data-page-node-id="28RqI9e6DBbrEZUFkJcp2S">0</div>
+        </div>
+        <div class="rs-block" style="font-size:clamp(20px,3vw,44px);color:#9FC4E8;font-weight:800" data-page-node-id="wEMbTB8xoRwlqAaNYtQUvN">VS</div>
+        <div class="rs-block right" data-page-node-id="iXXgMz0GWBfPWiLM7zcI6Z">
+          <div class="rs-name" data-page-node-id="WpOQp4IBKQ2MShvhwvbVHM">TEAM B</div>
+          <div class="rs-num" id="result-b" data-page-node-id="jlQxzUhjFfjE33rYHEDA2P">0</div>
+        </div>
+      </div>
+      <div class="winner-banner" id="winner-banner" data-page-node-id="MNWB7jSsmN0Qj2iJvo0bxA">TEAM A WINS!</div>
+    </div>
+    <div class="screen-footer footer-controls" data-page-node-id="vdaUWfjxa2cY28fOCvkkfY">
+      <button class="btn btn-start" id="btn-check" data-page-node-id="rbumsuemwPfxITCK2FIQcR">CHECK THE ANSWERS</button>
+    </div>
+  </section>
+
+  <!-- ============ ANSWERS SCREEN ============ -->
+  <section class="screen" id="screen-answers" data-page-node-id="ud31bTARDqYvqGnVhygxrv">
+    <div class="screen-top ans-top" data-page-node-id="mG1lRxSuWSqPArbKE2DJqS">
+      <div class="ans-title" data-page-node-id="ZFxvzIas7t1i8yfNhsk1Ke">SPACE KNOWLEDGE — ANSWERS</div>
+      <div class="ans-counter" id="ans-counter" data-page-node-id="D1uDI5iKkIyXhymwmxWFxU">Question 1 / 5</div>
+    </div>
+    <div class="screen-mid" data-page-node-id="m8CREQvxRqHLlWXVzANAm4">
+      <div class="card" id="answers-card" data-page-node-id="FfD4uUrsNwcrF57afffKtZ"></div>
+    </div>
+    <div class="screen-footer footer-controls" id="answers-footer" data-page-node-id="WU7lWxtWkNKCPA7BAilrOO">
+      <button class="btn btn-ghost" id="btn-prev" data-page-node-id="kLoKMOfvLxZ6bFBLqiMyLH">PREVIOUS</button>
+      <button class="btn btn-next" id="btn-next-ans" data-page-node-id="fM4r0sFmTXE5G7NzAdc3v4">NEXT</button>
+      <button class="btn btn-ghost hidden" id="btn-again" data-page-node-id="ddzRcnHIzDy5enFFieusC0">PLAY AGAIN</button>
+      <button class="btn btn-ghost hidden" id="btn-home" data-page-node-id="mlKb8be5twPqXMg53jQT7I">BACK TO HOME</button>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===================== DATA ===================== */
+const QUESTIONS = [
+  {
+    text: "There are eight planets in the Solar System.",
+    answer: true,
+    explanation: "There are eight planets in our Solar System: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.",
+    img: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="13" fill="#FFD23F"/>
+      <circle cx="50" cy="50" r="13" fill="none" stroke="#FFE08A" stroke-width="2" opacity=".6"/>
+      <ellipse cx="50" cy="50" rx="33" ry="14" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.5"/>
+      <ellipse cx="50" cy="50" rx="43" ry="10" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
+      <circle cx="83" cy="50" r="4.5" fill="#5BC8FF"/>
+      <circle cx="93" cy="50" r="3" fill="#2EE6A6"/>
+      <circle cx="65" cy="36" r="3.6" fill="#FF9F43"/>
+    </svg>`
+  },
+  {
+    text: "Footprints(脚印) left by astronauts on the lunar surface(月球表面) would disappear.",
+    answer: false,
+    explanation: "There is almost no atmosphere on the Moon. There is no wind or rain to wash the footprints away, so astronauts' footprints can remain for a very long time.",
+    img: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="32" fill="#E2E8F0"/>
+      <circle cx="40" cy="40" r="5" fill="#B6C2D0"/>
+      <circle cx="62" cy="36" r="3.5" fill="#B6C2D0"/>
+      <circle cx="58" cy="64" r="6" fill="#B6C2D0"/>
+      <circle cx="36" cy="62" r="3" fill="#B6C2D0"/>
+      <ellipse cx="50" cy="56" rx="7" ry="10" fill="#94A1B0"/>
+      <circle cx="46" cy="42" r="2.6" fill="#94A1B0"/>
+      <circle cx="52" cy="40" r="2.6" fill="#94A1B0"/>
+      <circle cx="44" cy="46" r="2.2" fill="#94A1B0"/>
+      <circle cx="55" cy="45" r="2.2" fill="#94A1B0"/>
+    </svg>`
+  },
+  {
+    text: "The hottest planet in the Solar System is Venus(金星).",
+    answer: true,
+    explanation: "Venus is the hottest planet in the Solar System. Its average surface temperature is about 462°C. Its thick atmosphere traps heat through a strong greenhouse effect.",
+    img: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="30" fill="#F0A24B"/>
+      <ellipse cx="50" cy="44" rx="26" ry="7" fill="#D98633" opacity=".55"/>
+      <ellipse cx="50" cy="58" rx="22" ry="6" fill="#D98633" opacity=".45"/>
+      <ellipse cx="50" cy="68" rx="14" ry="4" fill="#D98633" opacity=".4"/>
+      <circle cx="50" cy="50" r="30" fill="none" stroke="#FFD8A0" stroke-width="2" opacity=".5"/>
+    </svg>`
+  },
+  {
+    text: "The human body will explode(爆炸) in space without a spacesuit(太空服).",
+    answer: false,
+    explanation: "A human body would not explode in space. However, without a spacesuit, a person would quickly lose consciousness because of the lack of oxygen and the extremely low pressure.",
+    img: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="36" r="17" fill="#EAF4FF"/>
+      <circle cx="50" cy="36" r="11" fill="#3DA9E0"/>
+      <ellipse cx="46" cy="32" rx="3.5" ry="5.5" fill="#BFE6FF" opacity=".7"/>
+      <rect x="37" y="54" width="26" height="30" rx="11" fill="#EAF4FF"/>
+      <rect x="41" y="57" width="18" height="15" rx="6" fill="#C9D8E8"/>
+      <rect x="28" y="56" width="9" height="20" rx="4.5" fill="#EAF4FF"/>
+      <rect x="63" y="56" width="9" height="20" rx="4.5" fill="#EAF4FF"/>
+    </svg>`
+  },
+  {
+    text: "There is no sound in space.",
+    answer: true,
+    explanation: "Sound needs a medium such as air, water or another material to travel through. Space is almost a vacuum, so sound cannot travel normally through space.",
+    img: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M34 42 L46 42 L60 30 L60 70 L46 58 L34 58 Z" fill="#5BC8FF"/>
+      <path d="M68 40 Q80 50 68 60" fill="none" stroke="#FF5A5A" stroke-width="4" stroke-linecap="round"/>
+      <path d="M76 34 Q92 50 76 66" fill="none" stroke="#FF5A5A" stroke-width="4" stroke-linecap="round"/>
+      <line x1="30" y1="30" x2="88" y2="82" stroke="#FF5A5A" stroke-width="4" stroke-linecap="round"/>
+    </svg>`
+  }
+];
+
+/* ===================== STATE ===================== */
+let currentIndex = 0;
+let scoreA = 0;
+let scoreB = 0;
+let statusA = "idle";   // idle | correct | wrong
+let statusB = "idle";
+let roundOver = false;
+let advanceTimer = null;
+
+/* ===================== HELPERS ===================== */
+const $ = (id) => document.getElementById(id);
+
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $("screen-" + name).classList.add("active");
+}
+
+function buildStars() {
+  const sf = $("starfield");
+  const count = 170;
+  let html = "";
+  for (let i = 0; i < count; i++) {
+    const size = (Math.random() * 2.4 + 0.8).toFixed(1);
+    const left = (Math.random() * 100).toFixed(2);
+    const top = (Math.random() * 100).toFixed(2);
+    const delay = (Math.random() * 4).toFixed(2);
+    const dur = (Math.random() * 3 + 2).toFixed(2);
+    html += `<div class="star" style="width:${size}px;height:${size}px;left:${left}%;top:${top}%;animation-delay:${delay}s;animation-duration:${dur}s;"></div>`;
+  }
+  sf.innerHTML = html;
+}
+
+/* ===================== QUIZ FLOW ===================== */
+function startMission() {
+  currentIndex = 0;
+  scoreA = 0; scoreB = 0;
+  statusA = "idle"; statusB = "idle"; roundOver = false;
+  if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+  $("score-a").textContent = "0";
+  $("score-b").textContent = "0";
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+  statusA = "idle"; statusB = "idle"; roundOver = false;
+  const q = QUESTIONS[currentIndex];
+
+  $("q-counter").textContent = "Question " + (currentIndex + 1) + " / 5";
+  $("question-text").textContent = q.text;
+  $("question-img").innerHTML = q.img;
+
+  ["a", "b"].forEach(t => {
+    $("side-" + t).classList.remove("locked", "out");
+    document.querySelectorAll(`.team-buttons[data-team="${t}"] .btn`).forEach(b => b.disabled = false);
+    const fb = $("fb-" + t);
+    fb.textContent = "";
+    fb.className = "team-feedback";
+  });
+
+  $("btn-next").classList.add("hidden");
+}
+
+function chooseTeam(team, val) {
+  if (roundOver) return;
+  if ((team === "a" ? statusA : statusB) !== "idle") return;
+
+  const q = QUESTIONS[currentIndex];
+  const correct = (val === q.answer);
+  const other = team === "a" ? "b" : "a";
+
+  if (correct) {
+    // correct -> that team scores, round ends, other team cannot answer
+    if (team === "a") { scoreA++; $("score-a").textContent = scoreA; }
+    else { scoreB++; $("score-b").textContent = scoreB; }
+    popScore(team);
+    setFeedback(team, true);
+    $("side-" + team).classList.add("locked");   // winner glow
+    $("side-" + other).classList.add("out");      // other team can't answer
+    disableTeam(team); disableTeam(other);
+    if (team === "a") statusA = "correct"; else statusB = "correct";
+    roundOver = true;
+    finishRound();
+  } else {
+    // wrong -> this team is out, the other team may steal
+    setFeedback(team, false);
+    $("side-" + team).classList.add("out");
+    disableTeam(team);
+    if (team === "a") statusA = "wrong"; else statusB = "wrong";
+    if (statusA === "wrong" && statusB === "wrong") {
+      // both wrong -> round over, no points
+      roundOver = true;
+      finishRound();
+    }
+    // otherwise the other team's buttons stay enabled to answer
+  }
+}
+
+function setFeedback(team, correct) {
+  const fb = $("fb-" + team);
+  if (correct) { fb.textContent = "CORRECT! +1"; fb.className = "team-feedback correct"; }
+  else { fb.textContent = "WRONG!"; fb.className = "team-feedback wrong"; }
+}
+
+function disableTeam(team) {
+  document.querySelectorAll(`.team-buttons[data-team="${team}"] .btn`).forEach(b => b.disabled = true);
+}
+
+function popScore(team) {
+  const el = team === "a" ? $("score-a") : $("score-b");
+  el.classList.add("pop");
+  setTimeout(() => el.classList.remove("pop"), 320);
+}
+
+// After a round is decided, reveal NEXT as a manual fallback AND auto-advance.
+function finishRound() {
+  const last = (currentIndex === QUESTIONS.length - 1);
+  $("btn-next").textContent = last ? "SEE RESULT" : "NEXT QUESTION";
+  $("btn-next").classList.remove("hidden");
+  advanceTimer = setTimeout(() => {
+    advanceTimer = null;
+    nextQuestion();
+  }, 1700);
+}
+
+function nextQuestion() {
+  if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+  if (currentIndex < QUESTIONS.length - 1) {
+    currentIndex++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+/* ===================== RESULT ===================== */
+function showResult() {
+  $("result-a").textContent = scoreA;
+  $("result-b").textContent = scoreB;
+  const banner = $("winner-banner");
+  if (scoreA > scoreB) {
+    banner.textContent = "TEAM A WINS!";
+    banner.className = "winner-banner a";
+  } else if (scoreB > scoreA) {
+    banner.textContent = "TEAM B WINS!";
+    banner.className = "winner-banner b";
+  } else {
+    banner.textContent = "IT'S A TIE!";
+    banner.className = "winner-banner tie";
+  }
+  showScreen("result");
+  launchConfetti();
+}
+
+function launchConfetti() {
+  const box = $("confetti");
+  box.innerHTML = "";
+  const colors = ["#FFD23F", "#38E0FF", "#FF9F43", "#2EE6A6", "#5BC8FF", "#FFFFFF"];
+  const n = 80;
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement("div");
+    c.className = "conf";
+    c.style.left = (Math.random() * 100) + "%";
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    const size = (Math.random() * 1.6 + 0.8).toFixed(1);
+    c.style.width = size + "vw";
+    c.style.height = size + "vw";
+    c.style.animationDuration = (Math.random() * 3 + 3).toFixed(1) + "s";
+    c.style.animationDelay = (Math.random() * 2).toFixed(1) + "s";
+    box.appendChild(c);
+  }
+  setTimeout(() => { box.innerHTML = ""; }, 9000);
+}
+
+/* ===================== ANSWERS ===================== */
+let ansIndex = 0;
+
+function openAnswers() {
+  ansIndex = 0;
+  showScreen("answers");
+  renderAnswerCard();
+}
+
+function renderAnswerCard() {
+  const card = $("answers-card");
+  const counter = $("ans-counter");
+  const prev = $("btn-prev");
+  const next = $("btn-next-ans");
+  const again = $("btn-again");
+  const home = $("btn-home");
+
+  if (ansIndex >= QUESTIONS.length) {
+    counter.textContent = "Complete";
+    card.innerHTML = `
+      <div class="finale">
+        <div class="finale-big">MISSION ACCOMPLISHED!</div>
+        <div class="finale-sub">Great job, space explorers!</div>
+      </div>`;
+    prev.classList.add("hidden");
+    next.classList.add("hidden");
+    again.classList.remove("hidden");
+    home.classList.remove("hidden");
+    return;
+  }
+
+  const q = QUESTIONS[ansIndex];
+  counter.textContent = "Question " + (ansIndex + 1) + " / 5";
+  card.innerHTML = `
+    <div class="card-qnum">QUESTION ${ansIndex + 1} / 5</div>
+    <div class="card-img">${q.img}</div>
+    <div class="card-question">${q.text}</div>
+    <div class="card-options">
+      <div class="opt ${q.answer === true ? 'correct' : ''}">TRUE</div>
+      <div class="opt ${q.answer === false ? 'correct' : ''}">FALSE</div>
+    </div>
+    <div class="card-answer"><span class="lbl">Correct Answer:&nbsp;</span><span class="val">${q.answer ? 'TRUE' : 'FALSE'}</span></div>
+    <div class="card-exp"><span class="lbl">Explanation:&nbsp;</span>${q.explanation}</div>`;
+  prev.classList.toggle("hidden", ansIndex === 0);
+  next.classList.remove("hidden");
+  next.textContent = (ansIndex === QUESTIONS.length - 1) ? "FINISH" : "NEXT";
+  again.classList.add("hidden");
+  home.classList.add("hidden");
+  card.scrollTop = 0;
+}
+
+/* ===================== WIRE UP ===================== */
+buildStars();
+$("btn-start").addEventListener("click", startMission);
+document.querySelectorAll(".team-buttons .btn").forEach(b => {
+  b.addEventListener("click", () => chooseTeam(b.dataset.team, b.dataset.val === "true"));
+});
+$("btn-next").addEventListener("click", nextQuestion);
+$("btn-check").addEventListener("click", openAnswers);
+$("btn-next-ans").addEventListener("click", () => { ansIndex++; renderAnswerCard(); });
+$("btn-prev").addEventListener("click", () => { if (ansIndex > 0) { ansIndex--; renderAnswerCard(); } });
+$("btn-again").addEventListener("click", startMission);
+$("btn-home").addEventListener("click", () => showScreen("start"));
+</script>
+</body>
+</html>
